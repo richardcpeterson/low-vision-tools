@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+
+    <!-- 16x16 convolution matrix -->
+    <filter id="keratoconus" x="0" y="0" width="100%" height="100%">
+      <feConvolveMatrix order="16" edgeMode="duplicate" kernelMatrix="
+        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+        0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 
+        0 0 0 0 0 1 1 1 2 1 1 1 0 0 1 0 
+        0 0 0 0 0 1 1 5 4 2 1 1 0 1 1 0 
+        0 1 1 0 0 1 1 7 9 7 2 1 1 0 1 3 
+        2 5 2 2 1 1 4 6 7 5 0 0 0 0 0 0 
+        1 0 0 0 0 0 3 2 1 2 3 0 0 0 0 0 
+        0 0 0 0 0 3 0 0 0 0 3 0 0 0 0 0 
+        0 0 0 0 6 3 0 0 0 0 1 0 0 0 0 0 
+        0 0 0 3 0 0 0 0 0 0 2 5 0 0 0 0 
+        0 2 3 1 0 0 0 0 0 0 0 0 1 0 0 0 
+        2 3 5 3 2 0 0 0 0 0 0 0 2 5 2 0
+      " />
+    </filter>
+
+    <!-- Simple Gaussian blur -->
+    <filter id="farsightedness"
+            x="-60%" y="-60%" width="220%" height="220%"
+            primitiveUnits="userSpaceOnUse"
+            filterUnits="userSpaceOnUse"
+            color-interpolation-filters="linearRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="anchor" />
+    </filter>
+
+    <!-- Compound blur with offsets and weighting -->
+    <filter id="astigmatism"
+            x="-60%" y="-60%" width="220%" height="220%"
+            primitiveUnits="userSpaceOnUse"
+            filterUnits="userSpaceOnUse"
+            color-interpolation-filters="linearRGB">
+
+      <!-- Base blur -->
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="anchor" />
+
+      <!-- Offset copies -->
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="b2" />
+      <feOffset in="b2" dx="0" dy="12" result="b2o" />
+
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="b3" />
+      <feOffset in="b3" dx="3" dy="13" result="b3o" />
+
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b4" />
+      <feOffset in="b4" dx="-4" dy="15" result="b4o" />
+
+      <!-- Combine offset layers -->
+      <feBlend in="b2o" in2="b3o" mode="normal" result="mixb2b3" />
+      <feBlend in="mixb2b3" in2="b4o" mode="normal" result="mixb2b3b4" />
+
+      <!-- Weighting -->
+      <feComponentTransfer in="anchor" result="anchorWeighted">
+        <feFuncA type="linear" slope="1" />
+      </feComponentTransfer>
+
+      <feComponentTransfer in="mixb2b3b4" result="mixb2b3b4Weighted">
+        <feFuncA type="linear" slope="0.6" />
+      </feComponentTransfer>
+
+      <!-- Final mix -->
+      <feBlend in="anchorWeighted" in2="mixb2b3b4Weighted" mode="overlay" result="final" />
+    </filter>
+
+  </defs>
+</svg>
